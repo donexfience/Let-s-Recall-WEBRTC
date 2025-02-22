@@ -12,7 +12,7 @@ const RoomJoin: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="flex justify-center items-center">
       <h1>Join a Room</h1>
       <input
         type="text"
