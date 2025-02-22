@@ -2,7 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import io from "socket.io-client";
 import VideoPlayer from "./VideoPlayer";
-import Controls from "./Controls";
+import { Controls } from "./Controls";
+import RoomHeader from "./RoomHeader";
+import VideoLayout from "./Roomlayout";
 
 const socket = io("http://localhost:9005");
 
@@ -48,7 +50,7 @@ const Room: React.FC = () => {
         ],
       });
 
-      // Add local tracks to the peer connection
+      // Addingss local tracks to the peer connection
       if (localStream) {
         localStream.getTracks().forEach((track) => {
           pc.addTrack(track, localStream);
@@ -282,51 +284,26 @@ const Room: React.FC = () => {
     }
   };
   return (
-    <div className="p-4 bg-gray-900 min-h-screen">
-      <h1 className="text-2xl font-bold mb-4 text-white">Room: {roomId}</h1>
+    <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <RoomHeader roomId={roomId} />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Local video */}
+      <main className="pt-16 pb-20 px-4">
         {localStream && (
-          <div className="relative bg-gray-800 rounded-lg overflow-hidden">
-            <VideoPlayer
-              stream={localStream}
-              muted={true}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-              You
-            </div>
-          </div>
+          <VideoLayout
+            localStream={localStream}
+            remoteStreams={remoteStreams}
+          />
         )}
+      </main>
 
-        {/* Remote videos */}
-        {Object.entries(remoteStreams).map(([userId, stream]) => (
-          <div
-            key={userId}
-            className="relative bg-gray-800 rounded-lg overflow-hidden"
-          >
-            <VideoPlayer
-              stream={stream}
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded">
-              Participant {userId.slice(0, 4)}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2">
-        <Controls
-          isAudioEnabled={isAudioEnabled}
-          isVideoEnabled={isVideoEnabled}
-          isScreenSharing={isScreenSharing}
-          onToggleAudio={handleToggleAudio}
-          onToggleVideo={handleToggleVideo}
-          onScreenShare={handleScreenShare}
-        />
-      </div>
+      <Controls
+        isAudioEnabled={isAudioEnabled}
+        isVideoEnabled={isVideoEnabled}
+        isScreenSharing={isScreenSharing}
+        onToggleAudio={handleToggleAudio}
+        onToggleVideo={handleToggleVideo}
+        onScreenShare={handleScreenShare}
+      />
     </div>
   );
 };
